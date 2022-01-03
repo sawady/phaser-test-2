@@ -1,8 +1,9 @@
 import PhaserLogo from '../objects/phaserLogo'
 import FpsText from '../objects/fpsText'
+import Parser from '../parser'
 
 export default class MainScene extends Phaser.Scene {
-  fpsText
+  fpsText: FpsText
 
   constructor() {
     super({ key: 'MainScene' })
@@ -19,6 +20,11 @@ export default class MainScene extends Phaser.Scene {
         fontSize: '24px'
       })
       .setOrigin(1, 0)
+
+    this.add.text(15, this.cameras.main.height / 2, JSON.stringify(Parser.parse('[state hola] trigger = time')), {
+      color: '#000000',
+      fontSize: '24px'
+    })
   }
 
   update() {
