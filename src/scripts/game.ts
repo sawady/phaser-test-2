@@ -1,26 +1,30 @@
 import 'phaser'
 import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
+import { parsed, lookup } from '../scripts/parser'
+import lodash from 'lodash'
 
-const DEFAULT_WIDTH = 1280
-const DEFAULT_HEIGHT = 720
+const gameParams = parsed.game.params
 
 const config = {
-  type: Phaser.AUTO,
-  backgroundColor: '#ffffff',
+  type: lookup(gameParams, 'type'),
+  backgroundColor: lookup(gameParams, 'background-color'),
   scale: {
-    parent: 'phaser-game',
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: DEFAULT_WIDTH,
-    height: DEFAULT_HEIGHT
+    parent: lookup(gameParams, 'scale.parent'),
+    mode: lookup(gameParams, 'scale.mode'),
+    autoCenter: lookup(gameParams, 'scale.auto-center'),
+    width: lookup(gameParams, 'scale.width'),
+    height: lookup(gameParams, 'scale.height')
   },
   scene: [PreloadScene, MainScene],
   physics: {
-    default: 'arcade',
+    default: lookup(gameParams, 'physics.default'),
     arcade: {
-      debug: false,
-      gravity: { y: 400 }
+      debug: lookup(gameParams, 'physics.debug'),
+      gravity: {
+        x: lookup(gameParams, 'physics.gravity.x'),
+        y: lookup(gameParams, 'physics.gravity.y')
+      }
     }
   }
 }
