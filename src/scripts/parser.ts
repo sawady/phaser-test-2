@@ -4,19 +4,19 @@ import lodash from 'lodash'
 const parser = peggy.generate(
   `
 Game
-	= game:GameInfo defs:State* _ { return { game, defs } }
+	= game:GameInfo scenes:Scene* _ { return { game, scenes } }
 
 GameInfo
   = _ "[" _ "game" _ "]" params: Param* { return { params } }
 
 Scene
-  = _ "[" _ "scene" _ "]" params: Param* { return { params } }
+  = _ "[" _ "scene" _ scene:string _ "]" params: Param* states:State* { return { scene, params, states } }
 
 State
-  = _ "[" _ "state" _ state:string _ "]" params: Param* _ actions:Action* { return { state, params, actions } }
+  = _ "[" _ "state" _ state:string _ "]" params: Param* actions:Action* { return { state, params, actions } }
 
 Action
-  = _ "[" name:string _ "]" params:Param* { return { name, params } }
+  = _ "[" _ "action" _ name:string _ "]" params:Param* { return { name, params } }
 
 Param
   = _ name:string _ "=" _ expr:additive { return { name, expr } }
@@ -42,7 +42,7 @@ integer "integer"
   = digits:[0-9]+ { return parseInt(text().trim(), 10); }
 
 string "string"
-  = [ .#_a-z-A-Z]+ [.0-9]* { return text().trim(); }
+  = [ .#_a-z-A-Z]+ [0-9]* { return text().trim(); }
 
 _ "whitespace"
   = [ \\t\\n\\r]*
@@ -52,29 +52,33 @@ _ "whitespace"
 
 const parsed = parser.parse(
   `
-[game]
-type = Phaser.AUTO
-background-color = #ffffff
-scale.parent = phaser-game
-scale.mode = Phaser.Scale.FIT
-scale.auto-center = Phaser.Scale.CENTER_BOTH
-scale.width = 1280
-scale.height = 720
-physics.default = arcade
-physics.debug  = true
-physics.gravity.x = 0
-physics.gravity.y = 100
-
-
-[state standing]
-spite = phaser-logo
-
-[vel set]
-x = 100`
+  [game]
+  type = Phaser.AUTO
+  background-color = #ffffff
+  scale.parent = phaser-game
+  scale.mode = Phaser.Scale.FIT
+  scale.auto-center = Phaser.Scale.CENTER_BOTH
+  scale.width = 1280
+  scale.height = 720
+  physics.default = arcade
+  physics.debug  = true
+  physics.gravity.x = 0
+  physics.gravity.y = 100
+  
+  [scene preload]
+  
+  [state standing]
+  spite = phaser-logo
+  
+  [action vel-set]
+  x = 100
+  
+  [scene main]
+`
 )
 
 console.log(parsed)
 
-const lookup = (obj, name) => lodash.find(obj, { name })?.expr
+const lookup = (obj: any, name: string) => lodash.find(obj, { name })?.expr
 
 export { parser, parsed, lookup }

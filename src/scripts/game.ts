@@ -2,7 +2,6 @@ import 'phaser'
 import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
 import { parsed, lookup } from '../scripts/parser'
-import lodash from 'lodash'
 
 const gameParams = parsed.game.params
 
