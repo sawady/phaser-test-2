@@ -1,28 +1,40 @@
 import 'phaser'
 import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
-import { parsed, lookup } from '../scripts/parser'
+import { parsed, lookup, lookupExpr } from '../scripts/parser'
+import lodash from 'lodash'
 
 const gameParams = parsed.game.params
+const preloadSceneActions = parsed.scenes[0].actions
+  .filter(action => action.name === 'preload')
+  .map(action => action.params)
+
+const preloadImages = preloadSceneActions.map(action => ({
+  type: lookup(action, 'type'),
+  name: lookup(action, 'name'),
+  value: lookup(action, 'type')
+}))
+
+console.log(preloadImages)
 
 const config = {
-  type: lookup(gameParams, 'type'),
-  backgroundColor: lookup(gameParams, 'background-color'),
+  type: lookupExpr(gameParams, 'type'),
+  backgroundColor: lookupExpr(gameParams, 'background-color'),
   scale: {
-    parent: lookup(gameParams, 'scale.parent'),
-    mode: lookup(gameParams, 'scale.mode'),
-    autoCenter: lookup(gameParams, 'scale.auto-center'),
-    width: lookup(gameParams, 'scale.width'),
-    height: lookup(gameParams, 'scale.height')
+    parent: lookupExpr(gameParams, 'scale.parent'),
+    mode: lookupExpr(gameParams, 'scale.mode'),
+    autoCenter: lookupExpr(gameParams, 'scale.auto-center'),
+    width: lookupExpr(gameParams, 'scale.width'),
+    height: lookupExpr(gameParams, 'scale.height')
   },
   scene: [PreloadScene, MainScene],
   physics: {
-    default: lookup(gameParams, 'physics.default'),
+    default: lookupExpr(gameParams, 'physics.default'),
     arcade: {
-      debug: lookup(gameParams, 'physics.debug'),
+      debug: lookupExpr(gameParams, 'physics.debug'),
       gravity: {
-        x: lookup(gameParams, 'physics.gravity.x'),
-        y: lookup(gameParams, 'physics.gravity.y')
+        x: lookupExpr(gameParams, 'physics.gravity.x'),
+        y: lookupExpr(gameParams, 'physics.gravity.y')
       }
     }
   }

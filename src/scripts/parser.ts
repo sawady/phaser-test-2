@@ -10,7 +10,13 @@ GameInfo
   = _ "[" _ "game" _ "]" params: Param* { return { params } }
 
 Scene
-  = _ "[" _ "scene" _ scene:string _ "]" params: Param* states:State* { return { scene, params, states } }
+  = _ "[" _ "scene" _ scene:string _ "]" params: Param* actions: Action* objects:Object* { return { scene, params, actions, objects } }
+
+Preload
+  = _ "[" _ "preload" _ name:string _ "]" params:Param* { return { name, params } }
+
+Object
+  = _ "[" _ "object" _ object:string _ "]" params: Param* states:State* { return { object, params, states } }
 
 State
   = _ "[" _ "state" _ state:string _ "]" params: Param* actions:Action* { return { state, params, actions } }
@@ -56,7 +62,7 @@ const parsed = parser.parse(
   type = Phaser.AUTO
   background-color = #ffffff
   scale.parent = phaser-game
-  scale.mode = Phaser.Scale.FIT
+  scale.mode = Phaser.Scale.FITf
   scale.auto-center = Phaser.Scale.CENTER_BOTH
   scale.width = 1280
   scale.height = 720
@@ -66,19 +72,28 @@ const parsed = parser.parse(
   physics.gravity.y = 100
   
   [scene preload]
-  
-  [state standing]
+
+  [action preload]
+  type = image
+  name = phaser-logo
+  value = assets/img/phaser-logo.png
+
+  [scene main]
+
+  [object logo]
+
+  [state boundcing]
   spite = phaser-logo
   
   [action vel-set]
   x = 100
-  
-  [scene main]
 `
 )
 
 console.log(parsed)
 
+const lookupExpr = (obj: any, name: string) => lodash.find(obj, { name })?.expr
+
 const lookup = (obj: any, name: string) => lodash.find(obj, { name })?.expr
 
-export { parser, parsed, lookup }
+export { parser, parsed, lookupExpr, lookup }
